@@ -2,20 +2,20 @@ import { prisma } from '$lib/prisma.js';
 import { nanoid } from 'nanoid';
 
 export const actions = {
-	short: async ({ request }) => {
+	short: async ({ request, url }) => {
 		const formData = await request.formData();
 		const longUrl = formData.get('url') as string;
 
 		if (longUrl) {
 			const shortCode = nanoid(13);
-			const url = await prisma.url.findFirst({
+			const dbUrl = await prisma.url.findFirst({
 				where: {
 					long_url: longUrl
 				}
 			});
 
-			if (url) {
-				return { short_url: `https://sh.alopezmzt.com/${url.short_code}` };
+			if (dbUrl) {
+				return { short_url: `${url.origin}/${dbUrl.short_code}` };
 			} else {
 				const newUrl = await prisma.url.create({
 					data: {
@@ -24,7 +24,7 @@ export const actions = {
 					}
 				});
 
-				return { short_url: `https://sh.alopezmzt.com/${newUrl.short_code}` };
+				return { short_url: `${url.origin}/${newUrl.short_code}` };
 			}
 		}
 	}
