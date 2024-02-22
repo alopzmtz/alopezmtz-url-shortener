@@ -1,13 +1,10 @@
 FROM node:20-alpine AS builder
-ENV PNPM_HOME="/pnpm"
-ENV PATH="$PNPM_HOME:$PATH"
-RUN corepack enable
 WORKDIR /app
 COPY package*.json .
-RUN pnpm install
+RUN npm ci
 COPY . .
-RUN pnpm run build
-RUN pnpm prune --production
+RUN npm run build
+RUN npm prune --production
 
 FROM node:20-alpine
 WORKDIR /app
